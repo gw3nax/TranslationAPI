@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: bot
+  jackson:
+    time-zone: UTC
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: username
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+server:
+  port: 8080
+app:
+  translator-url: https://translate.api.cloud.yandex.net/translate/v2/translate
+  translator-api-key: AQVNzzqiL4stEfsz2wfijhEBHkSqeU9Jy9czpPOH
+

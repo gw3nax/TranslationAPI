@@ -9,6 +9,7 @@ import main.translationapi.dto.YandexApiResponse;
 import main.translationapi.entity.TranslationEntity;
 import main.translationapi.exception.LanguageNotFoundException;
 import main.translationapi.exception.TooManyRequestsException;
+import main.translationapi.exception.TranslationResourceAccessException;
 import main.translationapi.mapper.YandexRequestMapper;
 import main.translationapi.mapper.YandexResponseMapper;
 import main.translationapi.repository.TranslationRepository;
@@ -99,6 +100,8 @@ public class TranslationService {
             HttpStatusCode httpStatusCode = e.getStatusCode();
             if (httpStatusCode == HttpStatusCode.valueOf(429)){
                 throw new TooManyRequestsException();
+            } else if (httpStatusCode == HttpStatusCode.valueOf(400)){
+                throw new TranslationResourceAccessException();
             }
         }
         return translationResponse;

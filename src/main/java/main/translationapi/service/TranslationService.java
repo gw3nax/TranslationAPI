@@ -7,10 +7,14 @@ import main.translationapi.dto.TranslationResponse;
 import main.translationapi.dto.YandexApiRequest;
 import main.translationapi.dto.YandexApiResponse;
 import main.translationapi.entity.TranslationEntity;
+import main.translationapi.exception.LanguageNotFoundException;
+import main.translationapi.exception.TooManyRequestsException;
 import main.translationapi.mapper.YandexRequestMapper;
 import main.translationapi.mapper.YandexResponseMapper;
 import main.translationapi.repository.TranslationRepository;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
@@ -46,6 +50,10 @@ public class TranslationService {
 
     public TranslationResponse translate(TranslationRequest translationRequest, HttpServletRequest request) {
 
+        if (translationRequest.getOriginalLang() == null || translationRequest.getOriginalLang().isEmpty()){
+            throw new LanguageNotFoundException();
+        }
+
         String[] wordsToTranslate = translationRequest.getTextToTranslate().split("\\s+");
         List<Future<TranslationResponse>> futures = new ArrayList<>();
 
@@ -60,9 +68,9 @@ public class TranslationService {
             try {
                 TranslationResponse response = future.get();
                 translatedWords.add(response.getTranslatedText());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -82,9 +90,17 @@ public class TranslationService {
     private TranslationResponse translateWord(TranslationRequest translationRequest) {
 
         YandexApiRequest yandexApiRequest = yandexRequestMapper.mapToYandexRequest(translationRequest);
-        YandexApiResponse yandexApiResponse = translator.postForObject(translationClient.getBaseUrl(), yandexApiRequest, YandexApiResponse.class);
-        TranslationResponse translationResponse = yandexResponseMapper.mapToTranslationResponse(yandexApiResponse);
+        TranslationResponse translationResponse = new TranslationResponse();
 
+        try {
+            YandexApiResponse yandexApiResponse = translator.postForObject(translationClient.getBaseUrl(), yandexApiRequest, YandexApiResponse.class);
+            translationResponse = yandexResponseMapper.mapToTranslationResponse(yandexApiResponse);
+        }catch (HttpClientErrorException e){
+            HttpStatusCode httpStatusCode = e.getStatusCode();
+            if (httpStatusCode == HttpStatusCode.valueOf(429)){
+                throw new TooManyRequestsException();
+            }
+        }
         return translationResponse;
     }
 }

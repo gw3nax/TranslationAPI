@@ -1,4 +1,4 @@
-# Multi-Language Translator
+# Translator API
 
 ## Описание проекта
 

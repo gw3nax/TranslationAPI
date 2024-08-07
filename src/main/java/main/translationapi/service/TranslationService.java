@@ -85,7 +85,7 @@ public class TranslationService {
         TranslationEntity translationEntity = new TranslationEntity();
         translationEntity.setOriginalText(translationRequest.getTextToTranslate());
         translationEntity.setTranslatedText(translatedText);
-        translationEntity.setIp(request.getRemoteAddr());
+        if (request != null) translationEntity.setIp(request.getRemoteAddr());
         translationRepository.save(translationEntity);
 
         return translationResponse;

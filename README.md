@@ -38,7 +38,7 @@
     "translatedLang": "ru"
 }   
 ```
-Вы можете это сделать через Postman так, как показано на скриншоте:
+Вы можете это сделать в Postman так, как показано на скриншоте:
 ![img.png](img.png)
 
 ## Структура базы Данных
@@ -112,3 +112,6 @@ CREATE TABLE translations (
    "path": "/api/v1/translate"
 }
 ```
+## Тестирование
+![img_1.png](img_1.png)
+

@@ -1,6 +1,6 @@
 spring:
   application:
-    name: bot
+    name: TranslationAPI
   jackson:
     time-zone: UTC
   datasource:

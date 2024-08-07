@@ -7,6 +7,7 @@ import main.translationapi.dto.TranslationResponse;
 import main.translationapi.dto.YandexApiRequest;
 import main.translationapi.dto.YandexApiResponse;
 import main.translationapi.entity.TranslationEntity;
+import main.translationapi.exception.AuthenticationException;
 import main.translationapi.exception.LanguageNotFoundException;
 import main.translationapi.exception.TooManyRequestsException;
 import main.translationapi.exception.TranslationResourceAccessException;
@@ -53,6 +54,8 @@ public class TranslationService {
 
         if (translationRequest.getOriginalLang() == null || translationRequest.getOriginalLang().isEmpty()){
             throw new LanguageNotFoundException();
+        } else if (translationRequest.getTranslatedLang() == null || translationRequest.getTranslatedLang().isEmpty()){
+            throw new LanguageNotFoundException("Не найден язык, на который необходимо перевести текст.");
         }
 
         String[] wordsToTranslate = translationRequest.getTextToTranslate().split("\\s+");
@@ -102,6 +105,8 @@ public class TranslationService {
                 throw new TooManyRequestsException();
             } else if (httpStatusCode == HttpStatusCode.valueOf(400)){
                 throw new TranslationResourceAccessException();
+            } else if (httpStatusCode == HttpStatusCode.valueOf(401)){
+                throw new AuthenticationException();
             }
         }
         return translationResponse;

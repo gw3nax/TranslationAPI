@@ -33,13 +33,13 @@ public class TranslationServiceTest {
 
     @ParameterizedTest
     @MethodSource("provideInputForTestTranslte")
-    public void testTranslate(TranslationRequest request, Object response) {
+    public void testTranslate(TranslationRequest request, TranslationResponse response) {
 
 
         TranslationResponse response1 = translationService.translate(request, null);
 
         assertNotNull(response);
-        Assertions.assertEquals(response, response1.getTranslatedText());
+        Assertions.assertEquals(response.getTranslatedText(), response1.getTranslatedText());
     }
     private static Stream<Arguments> provideInputForTestTranslte() {
         return Stream.of(
